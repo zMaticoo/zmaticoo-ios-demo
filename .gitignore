@@ -1,0 +1,62 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Xcode
+build/
+DerivedData/
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+xcuserdata/
+*.xccheckout
+*.xcscmblueprint
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+## Xcode Patch / breakpoints (optional)
+*.xcuserstate
+
+## Obj-C/Swift
+*.hmap
+
+## App packaging (unless intentionally versioning them)
+*.ipa
+*.dSYM.zip
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+.swiftpm/
+Packages/
+*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+
+# CocoaPods — install via `pod install`; keep Podfile & Podfile.lock tracked
+Pods/
+
+# Carthage
+Carthage/Build/
+
+# Accio
+Dependencies/
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# Code Injection / InjectionIII (optional)
+iOSInjectionProject/
+
+# Ruby / CocoaPods tooling (optional)
+vendor/bundle/

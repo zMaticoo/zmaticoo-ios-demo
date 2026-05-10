@@ -9,6 +9,8 @@
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
+/// Used when running below iOS 13 (no UIScene); required for iOS 12 window bootstrap.
+@property (nonatomic, strong) UIWindow *window;
 
 @end
 
