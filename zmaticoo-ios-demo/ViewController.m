@@ -5,26 +5,15 @@
 
 #import "ViewController.h"
 #import "MATDemoConfig.h"
+#import "MATDemoLog.h"
+#import "MATDemoTheme.h"
+#import "MATNativeAdRenderer.h"
+#import "MATNativeAdPresenter.h"
+#import "NativeListViewController.h"
 #import "SettingViewController.h"
 #import <MaticooSDK/MaticooSDK.h>
-#import <stdarg.h>
 
-static void MATDemoAdLog(NSString *unit, NSString *event, NSString *fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    NSString *detail = [[NSString alloc] initWithFormat:fmt arguments:args];
-    va_end(args);
-    NSLog(@"[zMaticooDemo][%@] %@ %@", unit, event, detail);
-}
-
-static NSString *MATDemoDescribeError(NSError *error) {
-    if (!error) {
-        return @"—";
-    }
-    return [NSString stringWithFormat:@"%@ (%ld)", error.localizedDescription ?: @"", (long)error.code];
-}
-
-@interface ViewController () <MATBannerAdDelegate, MATInterstitialAdDelegate, MATRewardedVideoAdDelegate>
+@interface ViewController () <MATBannerAdDelegate, MATInterstitialAdDelegate, MATRewardedVideoAdDelegate, MATNativeAdDelegate>
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UILabel *bannerStatusLabel;
 @property (nonatomic, strong) UIView *bannerContainer;
@@ -35,6 +24,8 @@ static NSString *MATDemoDescribeError(NSError *error) {
 @property (nonatomic, strong) UILabel *rewardStatusLabel;
 @property (nonatomic, strong) UIButton *rewardShowButton;
 @property (nonatomic, strong) MATRewardedVideoAd *rewardedVideoAd;
+@property (nonatomic, strong) UILabel *nativeStatusLabel;
+@property (nonatomic, strong) MATNativeAd *nativeAd;
 @property (nonatomic, strong) UIView *loadingOverlay;
 @end
 
@@ -42,7 +33,7 @@ static NSString *MATDemoDescribeError(NSError *error) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [self groupedBackgroundColor];
+    self.view.backgroundColor = [MATDemoTheme groupedBackgroundColor];
     [self buildLayout];
 }
 
@@ -57,23 +48,10 @@ static NSString *MATDemoDescribeError(NSError *error) {
     [self.bannerAd destroy];
     [MATInterstitialAd destroy:@[MAT_DEMO_INTERSTITIAL_PLACEMENT_ID]];
     [MATRewardedVideoAd destroy:@[MAT_DEMO_REWARD_PLACEMENT_ID]];
+    [self destroyNativeAd];
 }
 
 #pragma mark - UI
-
-- (UIColor *)groupedBackgroundColor {
-    if (@available(iOS 13.0, *)) {
-        return [UIColor systemGroupedBackgroundColor];
-    }
-    return [UIColor groupTableViewBackgroundColor];
-}
-
-- (UIColor *)cardColor {
-    if (@available(iOS 13.0, *)) {
-        return [UIColor secondarySystemGroupedBackgroundColor];
-    }
-    return [UIColor whiteColor];
-}
 
 - (UIView *)headerLogoContainer {
     UIView *wrap = [[UIView alloc] init];
@@ -108,12 +86,8 @@ static NSString *MATDemoDescribeError(NSError *error) {
     NSString *full = [NSString stringWithFormat:@"%@\n%@", line1, line2];
     NSMutableAttributedString *attr = [[NSMutableAttributedString alloc] initWithString:full];
 
-    UIColor *primaryColor = [UIColor blackColor];
-    UIColor *secondaryColor = [UIColor darkGrayColor];
-    if (@available(iOS 13.0, *)) {
-        primaryColor = [UIColor labelColor];
-        secondaryColor = [UIColor secondaryLabelColor];
-    }
+    UIColor *primaryColor = [MATDemoTheme primaryTextColor];
+    UIColor *secondaryColor = [MATDemoTheme tertiaryTextColor];
 
     [attr addAttributes:@{
         NSFontAttributeName: [UIFont boldSystemFontOfSize:28],
@@ -137,7 +111,7 @@ static NSString *MATDemoDescribeError(NSError *error) {
 
     UIStackView *stack = [[UIStackView alloc] init];
     stack.axis = UILayoutConstraintAxisVertical;
-    stack.spacing = 16;
+    stack.spacing = 14;
     stack.translatesAutoresizingMaskIntoConstraints = NO;
     [self.scrollView addSubview:stack];
 
@@ -169,12 +143,8 @@ static NSString *MATDemoDescribeError(NSError *error) {
 
     UILabel *sectionTitle = [[UILabel alloc] init];
     sectionTitle.text = @"Advertising Type Testing";
-    sectionTitle.font = [UIFont boldSystemFontOfSize:18];
-    if (@available(iOS 13.0, *)) {
-        sectionTitle.textColor = [UIColor labelColor];
-    } else {
-        sectionTitle.textColor = [UIColor blackColor];
-    }
+    sectionTitle.font = [UIFont boldSystemFontOfSize:17];
+    sectionTitle.textColor = [MATDemoTheme primaryTextColor];
     [stack addArrangedSubview:sectionTitle];
 
     UIStackView *bannerCard = [self verticalCardStack];
@@ -219,26 +189,36 @@ static NSString *MATDemoDescribeError(NSError *error) {
     self.rewardStatusLabel = [self statusLabel];
     [rewardCard addArrangedSubview:self.rewardStatusLabel];
     [stack addArrangedSubview:[self wrapCard:rewardCard]];
+
+    UIStackView *nativeCard = [self verticalCardStack];
+    [nativeCard addArrangedSubview:[self subsectionTitle:@"Native"]];
+    UIStackView *nativeButtons = [[UIStackView alloc] init];
+    nativeButtons.axis = UILayoutConstraintAxisHorizontal;
+    nativeButtons.spacing = 8;
+    nativeButtons.distribution = UIStackViewDistributionFillEqually;
+    [nativeButtons addArrangedSubview:[self primaryButton:@"Load" action:@selector(loadNativeTapped)]];
+    [nativeButtons addArrangedSubview:[self secondaryButton:@"Native List" action:@selector(openNativeListTapped)]];
+    [nativeCard addArrangedSubview:nativeButtons];
+    self.nativeStatusLabel = [self statusLabel];
+    [nativeCard addArrangedSubview:self.nativeStatusLabel];
+    [stack addArrangedSubview:[self wrapCard:nativeCard]];
 }
 
 - (UIView *)wrapCard:(UIStackView *)inner {
     UIView *card = [[UIView alloc] init];
-    card.backgroundColor = [self cardColor];
-    card.layer.cornerRadius = 8;
+    [MATDemoTheme applyCardStyleToView:card cornerRadius:12.0];
     card.layer.masksToBounds = NO;
-    if (@available(iOS 13.0, *)) {
-        card.layer.shadowColor = [UIColor blackColor].CGColor;
-        card.layer.shadowOpacity = 0.08;
-        card.layer.shadowRadius = 4;
-        card.layer.shadowOffset = CGSizeMake(0, 2);
-    }
+    card.layer.shadowColor = [UIColor blackColor].CGColor;
+    card.layer.shadowOpacity = 0.06;
+    card.layer.shadowRadius = 8.0;
+    card.layer.shadowOffset = CGSizeMake(0, 3);
     inner.translatesAutoresizingMaskIntoConstraints = NO;
     [card addSubview:inner];
     [NSLayoutConstraint activateConstraints:@[
-        [inner.topAnchor constraintEqualToAnchor:card.topAnchor constant:16],
-        [inner.leadingAnchor constraintEqualToAnchor:card.leadingAnchor constant:16],
-        [inner.trailingAnchor constraintEqualToAnchor:card.trailingAnchor constant:-16],
-        [inner.bottomAnchor constraintEqualToAnchor:card.bottomAnchor constant:-16],
+        [inner.topAnchor constraintEqualToAnchor:card.topAnchor constant:14],
+        [inner.leadingAnchor constraintEqualToAnchor:card.leadingAnchor constant:14],
+        [inner.trailingAnchor constraintEqualToAnchor:card.trailingAnchor constant:-14],
+        [inner.bottomAnchor constraintEqualToAnchor:card.bottomAnchor constant:-14],
     ]];
     return card;
 }
@@ -254,58 +234,31 @@ static NSString *MATDemoDescribeError(NSError *error) {
 - (UILabel *)subsectionTitle:(NSString *)text {
     UILabel *l = [[UILabel alloc] init];
     l.text = text;
-    l.font = [UIFont boldSystemFontOfSize:16];
-    if (@available(iOS 13.0, *)) {
-        l.textColor = [UIColor labelColor];
-    } else {
-        l.textColor = [UIColor blackColor];
-    }
+    l.font = [UIFont systemFontOfSize:15 weight:UIFontWeightSemibold];
+    l.textColor = [MATDemoTheme primaryTextColor];
     return l;
 }
 
 - (UILabel *)statusLabel {
     UILabel *l = [[UILabel alloc] init];
-    l.font = [UIFont systemFontOfSize:14];
+    l.font = [UIFont systemFontOfSize:13];
     l.numberOfLines = 0;
-    if (@available(iOS 13.0, *)) {
-        l.textColor = [UIColor secondaryLabelColor];
-    } else {
-        l.textColor = [UIColor darkGrayColor];
-    }
+    l.textColor = [MATDemoTheme tertiaryTextColor];
     return l;
 }
 
-- (UIButton *)mat_demo_styledButton {
-    UIButton *b = [UIButton buttonWithType:UIButtonTypeCustom];
-    b.layer.cornerRadius = 8;
-    b.layer.masksToBounds = YES;
-    b.contentEdgeInsets = UIEdgeInsetsMake(10, 12, 10, 12);
-    return b;
-}
-
 - (UIButton *)primaryButton:(NSString *)title action:(SEL)action {
-    UIButton *b = [self mat_demo_styledButton];
+    UIButton *b = [UIButton buttonWithType:UIButtonTypeCustom];
     [b setTitle:title forState:UIControlStateNormal];
-    [b setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    if (@available(iOS 13.0, *)) {
-        b.backgroundColor = [UIColor systemBlueColor];
-    } else {
-        b.backgroundColor = [UIColor colorWithRed:0 green:0.48 blue:1 alpha:1];
-    }
+    [MATDemoTheme applyPrimaryButtonStyle:b];
     [b addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
     return b;
 }
 
 - (UIButton *)secondaryButton:(NSString *)title action:(SEL)action {
-    UIButton *b = [self mat_demo_styledButton];
+    UIButton *b = [UIButton buttonWithType:UIButtonTypeCustom];
     [b setTitle:title forState:UIControlStateNormal];
-    if (@available(iOS 13.0, *)) {
-        b.backgroundColor = [UIColor tertiarySystemFillColor];
-        [b setTitleColor:[UIColor labelColor] forState:UIControlStateNormal];
-    } else {
-        b.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1];
-        [b setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
-    }
+    [MATDemoTheme applySecondaryButtonStyle:b];
     [b addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
     return b;
 }
@@ -406,6 +359,41 @@ static NSString *MATDemoDescribeError(NSError *error) {
     } else {
         self.rewardStatusLabel.text = @"not ready";
     }
+}
+
+- (void)destroyNativeAd {
+    [MATNativeAdPresenter dismissAnimated:NO];
+    if (self.nativeAd) {
+        [self.nativeAd destroy];
+        self.nativeAd = nil;
+    }
+}
+
+- (void)loadNativeTapped {
+    if (![[MaticooAds shareSDK] isInitSuccess]) {
+        self.nativeStatusLabel.text = @"Please Init SDK first";
+        return;
+    }
+
+    [self destroyNativeAd];
+    self.nativeStatusLabel.text = @"loading...";
+
+    MATNativeAd *ad = [[MATNativeAd alloc] initWithPlacementID:MAT_DEMO_NATIVE_PLACEMENT_ID];
+    ad.delegate = self;
+    self.nativeAd = ad;
+    [MATNativeAdRenderer configureNativeAd:ad];
+    [ad loadAd];
+}
+
+- (void)openNativeListTapped {
+    if (![[MaticooAds shareSDK] isInitSuccess]) {
+        [self flashMessage:@"Please Init SDK first"];
+        return;
+    }
+    NativeListViewController *listVC = [[NativeListViewController alloc] init];
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:listVC];
+    nav.modalPresentationStyle = UIModalPresentationFullScreen;
+    [self presentViewController:nav animated:YES completion:nil];
 }
 
 #pragma mark - Loading / toast
@@ -571,6 +559,44 @@ static NSString *MATDemoDescribeError(NSError *error) {
 
 - (void)rewardedVideoAdEndCardShow:(MATRewardedVideoAd *)rewardedVideoAd {
     MATDemoAdLog(@"Rewarded", @"endCardShow", @"placement=%@", MAT_DEMO_REWARD_PLACEMENT_ID);
+}
+
+#pragma mark - MATNativeAdDelegate
+
+- (void)nativeAdLoadSuccess:(MATNativeAd *)nativeAd {
+    MATDemoAdLog(@"Native", @"didLoad", @"placement=%@", nativeAd.placementID ?: @"?");
+    self.nativeStatusLabel.text = @"load success";
+    [self flashMessage:@"Native load success"];
+
+    __weak typeof(self) weakSelf = self;
+    [MATNativeAdPresenter presentNativeAd:nativeAd fromViewController:self onDismiss:^{
+        weakSelf.nativeStatusLabel.text = @"";
+        if (weakSelf.nativeAd) {
+            [weakSelf.nativeAd destroy];
+            weakSelf.nativeAd = nil;
+        }
+    }];
+}
+
+- (void)nativeAdFailed:(MATNativeAd *)nativeAd withError:(NSError *)error {
+    MATDemoAdLog(@"Native", @"didFailWithError", @"placement=%@ error=%@", nativeAd.placementID ?: @"?", MATDemoDescribeError(error));
+    self.nativeStatusLabel.text = [NSString stringWithFormat:@"load failed %@", error.localizedDescription ?: @""];
+    [self flashMessage:@"Native load failed"];
+}
+
+- (void)nativeAdDisplayed:(MATNativeAd *)nativeAd {
+    MATDemoAdLog(@"Native", @"didDisplay", @"placement=%@", nativeAd.placementID ?: @"?");
+}
+
+- (void)nativeAd:(MATNativeAd *)nativeAd displayFailWithError:(NSError *)error {
+    MATDemoAdLog(@"Native", @"displayFailWithError", @"placement=%@ error=%@", nativeAd.placementID ?: @"?", MATDemoDescribeError(error));
+    self.nativeStatusLabel.text = [NSString stringWithFormat:@"show failed %@", error.localizedDescription ?: @""];
+    [self flashMessage:@"Native show failed"];
+}
+
+- (void)nativeAdClicked:(MATNativeAd *)nativeAd {
+    MATDemoAdLog(@"Native", @"didClick", @"placement=%@", nativeAd.placementID ?: @"?");
+    [self flashMessage:@"Native clicked"];
 }
 
 @end
