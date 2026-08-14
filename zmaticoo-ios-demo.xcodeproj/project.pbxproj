@@ -8,12 +8,17 @@
 
 /* Begin PBXBuildFile section */
 		9C51CAEA01DE47CA595AC296 /* Pods_zmaticoo_ios_demo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F7BBEECFEDFA8AD718EEF9A1 /* Pods_zmaticoo_ios_demo.framework */; };
+		CF6585F9FD81FF8091CE430F /* Pods_zmaticoo_ios_demo_swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8E18B1688DF4AC380859191 /* Pods_zmaticoo_ios_demo_swift.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4DCC159E6FC4A1B0CD664668 /* Pods-zmaticoo-ios-demo-swift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-zmaticoo-ios-demo-swift.debug.xcconfig"; path = "Target Support Files/Pods-zmaticoo-ios-demo-swift/Pods-zmaticoo-ios-demo-swift.debug.xcconfig"; sourceTree = "<group>"; };
+		51316CEC17BA5B314DFD7373 /* Pods-zmaticoo-ios-demo-swift.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-zmaticoo-ios-demo-swift.release.xcconfig"; path = "Target Support Files/Pods-zmaticoo-ios-demo-swift/Pods-zmaticoo-ios-demo-swift.release.xcconfig"; sourceTree = "<group>"; };
 		7F8844477753F53F2A7897EB /* Pods-zmaticoo-ios-demo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-zmaticoo-ios-demo.release.xcconfig"; path = "Target Support Files/Pods-zmaticoo-ios-demo/Pods-zmaticoo-ios-demo.release.xcconfig"; sourceTree = "<group>"; };
 		829DFEC92FAF13A9008D93DF /* zmaticoo-ios-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "zmaticoo-ios-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		914AB8F3657001893809A752 /* Pods-zmaticoo-ios-demo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-zmaticoo-ios-demo.debug.xcconfig"; path = "Target Support Files/Pods-zmaticoo-ios-demo/Pods-zmaticoo-ios-demo.debug.xcconfig"; sourceTree = "<group>"; };
+		9D0000000000000000000002 /* zmaticoo-ios-demo-swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "zmaticoo-ios-demo-swift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B8E18B1688DF4AC380859191 /* Pods_zmaticoo_ios_demo_swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_zmaticoo_ios_demo_swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7BBEECFEDFA8AD718EEF9A1 /* Pods_zmaticoo_ios_demo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_zmaticoo_ios_demo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -25,6 +30,13 @@
 			);
 			target = 829DFEC82FAF13A9008D93DF /* zmaticoo-ios-demo */;
 		};
+		9D000000000000000000000A /* Exceptions for "zmaticoo-ios-demo-swift" folder in "zmaticoo-ios-demo-swift" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9D0000000000000000000001 /* zmaticoo-ios-demo-swift */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -34,6 +46,14 @@
 				829DFEE02FAF13AB008D93DF /* Exceptions for "zmaticoo-ios-demo" folder in "zmaticoo-ios-demo" target */,
 			);
 			path = "zmaticoo-ios-demo";
+			sourceTree = "<group>";
+		};
+		9D0000000000000000000009 /* zmaticoo-ios-demo-swift */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9D000000000000000000000A /* Exceptions for "zmaticoo-ios-demo-swift" folder in "zmaticoo-ios-demo-swift" target */,
+			);
+			path = "zmaticoo-ios-demo-swift";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -47,6 +67,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9D0000000000000000000004 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CF6585F9FD81FF8091CE430F /* Pods_zmaticoo_ios_demo_swift.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -54,6 +82,7 @@
 			isa = PBXGroup;
 			children = (
 				829DFECB2FAF13A9008D93DF /* zmaticoo-ios-demo */,
+				9D0000000000000000000009 /* zmaticoo-ios-demo-swift */,
 				829DFECA2FAF13A9008D93DF /* Products */,
 				91F73820BE8DCDA03C76D93C /* Pods */,
 				D3202E0E86985814528E9C1B /* Frameworks */,
@@ -64,6 +93,7 @@
 			isa = PBXGroup;
 			children = (
 				829DFEC92FAF13A9008D93DF /* zmaticoo-ios-demo.app */,
+				9D0000000000000000000002 /* zmaticoo-ios-demo-swift.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -73,6 +103,8 @@
 			children = (
 				914AB8F3657001893809A752 /* Pods-zmaticoo-ios-demo.debug.xcconfig */,
 				7F8844477753F53F2A7897EB /* Pods-zmaticoo-ios-demo.release.xcconfig */,
+				4DCC159E6FC4A1B0CD664668 /* Pods-zmaticoo-ios-demo-swift.debug.xcconfig */,
+				51316CEC17BA5B314DFD7373 /* Pods-zmaticoo-ios-demo-swift.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -81,6 +113,7 @@
 			isa = PBXGroup;
 			children = (
 				F7BBEECFEDFA8AD718EEF9A1 /* Pods_zmaticoo_ios_demo.framework */,
+				B8E18B1688DF4AC380859191 /* Pods_zmaticoo_ios_demo_swift.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -110,6 +143,28 @@
 			productReference = 829DFEC92FAF13A9008D93DF /* zmaticoo-ios-demo.app */;
 			productType = "com.apple.product-type.application";
 		};
+		9D0000000000000000000001 /* zmaticoo-ios-demo-swift */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9D0000000000000000000006 /* Build configuration list for PBXNativeTarget "zmaticoo-ios-demo-swift" */;
+			buildPhases = (
+				04A42A1261EC43B7FEED4DE6 /* [CP] Check Pods Manifest.lock */,
+				9D0000000000000000000003 /* Sources */,
+				9D0000000000000000000004 /* Frameworks */,
+				9D0000000000000000000005 /* Resources */,
+				57B54F5197677F5C9F969715 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				9D0000000000000000000009 /* zmaticoo-ios-demo-swift */,
+			);
+			name = "zmaticoo-ios-demo-swift";
+			productName = "zmaticoo-ios-demo-swift";
+			productReference = 9D0000000000000000000002 /* zmaticoo-ios-demo-swift.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -120,6 +175,9 @@
 				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					829DFEC82FAF13A9008D93DF = {
+						CreatedOnToolsVersion = 26.4;
+					};
+					9D0000000000000000000001 = {
 						CreatedOnToolsVersion = 26.4;
 					};
 				};
@@ -139,6 +197,7 @@
 			projectRoot = "";
 			targets = (
 				829DFEC82FAF13A9008D93DF /* zmaticoo-ios-demo */,
+				9D0000000000000000000001 /* zmaticoo-ios-demo-swift */,
 			);
 		};
 /* End PBXProject section */
@@ -151,9 +210,59 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9D0000000000000000000005 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		04A42A1261EC43B7FEED4DE6 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-zmaticoo-ios-demo-swift-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		57B54F5197677F5C9F969715 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-zmaticoo-ios-demo-swift/Pods-zmaticoo-ios-demo-swift-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-zmaticoo-ios-demo-swift/Pods-zmaticoo-ios-demo-swift-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-zmaticoo-ios-demo-swift/Pods-zmaticoo-ios-demo-swift-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		B69A5E3AD18B48C05B4AC96D /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -184,9 +293,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-zmaticoo-ios-demo/Pods-zmaticoo-ios-demo-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-zmaticoo-ios-demo/Pods-zmaticoo-ios-demo-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -197,6 +310,13 @@
 
 /* Begin PBXSourcesBuildPhase section */
 		829DFEC52FAF13A9008D93DF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9D0000000000000000000003 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -386,6 +506,58 @@
 			};
 			name = Release;
 		};
+		9D0000000000000000000007 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4DCC159E6FC4A1B0CD664668 /* Pods-zmaticoo-ios-demo-swift.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = 32Z4FX6L9H;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "zmaticoo-ios-demo-swift/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.zmaticoo.www.zmaticoo-ios-demo-swift";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9D0000000000000000000008 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 51316CEC17BA5B314DFD7373 /* Pods-zmaticoo-ios-demo-swift.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = 32Z4FX6L9H;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "zmaticoo-ios-demo-swift/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.zmaticoo.www.zmaticoo-ios-demo-swift";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -403,6 +575,15 @@
 			buildConfigurations = (
 				829DFEE22FAF13AB008D93DF /* Debug */,
 				829DFEE32FAF13AB008D93DF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9D0000000000000000000006 /* Build configuration list for PBXNativeTarget "zmaticoo-ios-demo-swift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9D0000000000000000000007 /* Debug */,
+				9D0000000000000000000008 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

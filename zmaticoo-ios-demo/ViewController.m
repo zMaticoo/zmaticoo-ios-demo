@@ -27,6 +27,26 @@
 @property (nonatomic, strong) UILabel *nativeStatusLabel;
 @property (nonatomic, strong) MATNativeAd *nativeAd;
 @property (nonatomic, strong) UIView *loadingOverlay;
+/// 最近一次 Waterfall load 成功对应的 Ids（SDK 新回调带回；show 时回传，Waterfall 下 SDK 忽略匹配）
+@property (nonatomic, strong) MATMaticooIds *interstitialIds;
+@property (nonatomic, strong) MATMaticooIds *rewardIds;
+// Header Bidding（插屏）
+@property (nonatomic, strong) UILabel *hbInterstitialStatusLabel;
+@property (nonatomic, strong) UIButton *hbInterstitialShowButton;
+@property (nonatomic, strong) MATInterstitialAd *hbInterstitialAd;
+@property (nonatomic, strong) MATMaticooIds *hbInterstitialIds;
+// Header Bidding（激励视频）
+@property (nonatomic, strong) UILabel *hbRewardStatusLabel;
+@property (nonatomic, strong) UIButton *hbRewardShowButton;
+@property (nonatomic, strong) MATRewardedVideoAd *hbRewardedVideoAd;
+@property (nonatomic, strong) MATMaticooIds *hbRewardIds;
+// Header Bidding（Banner）
+@property (nonatomic, strong) UILabel *hbBannerStatusLabel;
+@property (nonatomic, strong) UIView *hbBannerContainer;
+@property (nonatomic, strong) MATBannerAd *hbBannerAd;
+// Header Bidding（Native）
+@property (nonatomic, strong) UILabel *hbNativeStatusLabel;
+@property (nonatomic, strong) MATNativeAd *hbNativeAd;
 @end
 
 @implementation ViewController
@@ -46,8 +66,12 @@
 
 - (void)dealloc {
     [self.bannerAd destroy];
+    [self.hbBannerAd destroy];
+    [self.hbNativeAd destroy];
     [MATInterstitialAd destroy:@[MAT_DEMO_INTERSTITIAL_PLACEMENT_ID]];
     [MATRewardedVideoAd destroy:@[MAT_DEMO_REWARD_PLACEMENT_ID]];
+    [MATInterstitialAd destroy:@[MAT_DEMO_HB_INTERSTITIAL_PLACEMENT_ID]];
+    [MATRewardedVideoAd destroy:@[MAT_DEMO_HB_REWARD_PLACEMENT_ID]];
     [self destroyNativeAd];
 }
 
@@ -202,6 +226,63 @@
     self.nativeStatusLabel = [self statusLabel];
     [nativeCard addArrangedSubview:self.nativeStatusLabel];
     [stack addArrangedSubview:[self wrapCard:nativeCard]];
+
+    UILabel *hbSectionTitle = [[UILabel alloc] init];
+    hbSectionTitle.text = @"Header Bidding Testing";
+    hbSectionTitle.font = [UIFont boldSystemFontOfSize:17];
+    hbSectionTitle.textColor = [MATDemoTheme primaryTextColor];
+    [stack addArrangedSubview:hbSectionTitle];
+
+    UIStackView *hbInterCard = [self verticalCardStack];
+    [hbInterCard addArrangedSubview:[self subsectionTitle:@"Interstitial (Bidding)"]];
+
+    UIStackView *hbInterButtons = [[UIStackView alloc] init];
+    hbInterButtons.axis = UILayoutConstraintAxisHorizontal;
+    hbInterButtons.spacing = 8;
+    hbInterButtons.distribution = UIStackViewDistributionFillEqually;
+    [hbInterButtons addArrangedSubview:[self primaryButton:@"Bid + Load" action:@selector(hbBidAndLoadInterstitialTapped)]];
+    self.hbInterstitialShowButton = [self secondaryButton:@"Show" action:@selector(hbShowInterstitialTapped)];
+    self.hbInterstitialShowButton.enabled = NO;
+    [hbInterButtons addArrangedSubview:self.hbInterstitialShowButton];
+    [hbInterCard addArrangedSubview:hbInterButtons];
+    self.hbInterstitialStatusLabel = [self statusLabel];
+    [hbInterCard addArrangedSubview:self.hbInterstitialStatusLabel];
+    [stack addArrangedSubview:[self wrapCard:hbInterCard]];
+
+    UIStackView *hbRewardCard = [self verticalCardStack];
+    [hbRewardCard addArrangedSubview:[self subsectionTitle:@"Reward (Bidding)"]];
+    UIStackView *hbRewardButtons = [[UIStackView alloc] init];
+    hbRewardButtons.axis = UILayoutConstraintAxisHorizontal;
+    hbRewardButtons.spacing = 8;
+    hbRewardButtons.distribution = UIStackViewDistributionFillEqually;
+    [hbRewardButtons addArrangedSubview:[self primaryButton:@"Bid + Load" action:@selector(hbBidAndLoadRewardTapped)]];
+    self.hbRewardShowButton = [self secondaryButton:@"Show" action:@selector(hbShowRewardTapped)];
+    self.hbRewardShowButton.enabled = NO;
+    [hbRewardButtons addArrangedSubview:self.hbRewardShowButton];
+    [hbRewardCard addArrangedSubview:hbRewardButtons];
+    self.hbRewardStatusLabel = [self statusLabel];
+    [hbRewardCard addArrangedSubview:self.hbRewardStatusLabel];
+    [stack addArrangedSubview:[self wrapCard:hbRewardCard]];
+
+    UIStackView *hbBannerCard = [self verticalCardStack];
+    [hbBannerCard addArrangedSubview:[self subsectionTitle:@"Banner (Bidding)"]];
+    [hbBannerCard addArrangedSubview:[self primaryButton:@"Bid + Load" action:@selector(hbBidAndLoadBannerTapped)]];
+    self.hbBannerStatusLabel = [self statusLabel];
+    [hbBannerCard addArrangedSubview:self.hbBannerStatusLabel];
+    self.hbBannerContainer = [[UIView alloc] init];
+    self.hbBannerContainer.backgroundColor = [UIColor clearColor];
+    self.hbBannerContainer.hidden = YES;
+    self.hbBannerContainer.translatesAutoresizingMaskIntoConstraints = NO;
+    [hbBannerCard addArrangedSubview:self.hbBannerContainer];
+    [self.hbBannerContainer.heightAnchor constraintEqualToConstant:50].active = YES;
+    [stack addArrangedSubview:[self wrapCard:hbBannerCard]];
+
+    UIStackView *hbNativeCard = [self verticalCardStack];
+    [hbNativeCard addArrangedSubview:[self subsectionTitle:@"Native (Bidding)"]];
+    [hbNativeCard addArrangedSubview:[self primaryButton:@"Bid + Load" action:@selector(hbBidAndLoadNativeTapped)]];
+    self.hbNativeStatusLabel = [self statusLabel];
+    [hbNativeCard addArrangedSubview:self.hbNativeStatusLabel];
+    [stack addArrangedSubview:[self wrapCard:hbNativeCard]];
 }
 
 - (UIView *)wrapCard:(UIStackView *)inner {
@@ -331,7 +412,8 @@
 - (void)showInterstitialTapped {
     if (self.interstitialAd.isReady) {
         self.interstitialStatusLabel.text = @"";
-        [self.interstitialAd showAdFromViewController:self];
+        // Waterfall 场景 SDK 忽略 maticooIds 匹配，回传仅作一致性演示
+        [self.interstitialAd showAdFromViewController:self maticooIds:self.interstitialIds];
     } else {
         self.interstitialStatusLabel.text = @"not ready";
     }
@@ -355,10 +437,149 @@
 - (void)showRewardTapped {
     if (self.rewardedVideoAd.isReady) {
         self.rewardStatusLabel.text = @"";
-        [self.rewardedVideoAd showAdFromViewController:self];
+        // Waterfall 场景 SDK 忽略 maticooIds 匹配，回传仅作一致性演示
+        [self.rewardedVideoAd showAdFromViewController:self maticooIds:self.rewardIds];
     } else {
         self.rewardStatusLabel.text = @"not ready";
     }
+}
+
+#pragma mark - Header Bidding actions
+
+/// 统一询价入口：成功后回调 biddingRequestId（内部已做主线程回跳 + reportTrack 上报）
+- (void)hbBidWithPlacementID:(NSString *)placementID
+                  completion:(void (^)(NSString *biddingRequestId))completion
+                     failure:(void (^)(NSError *error))failure {
+    MATBiddingRequestParameter *param = [[MATBiddingRequestParameter alloc] init];
+    param.placementId = placementID;
+    param.adxId = MAT_DEMO_ADX_ID;
+    [MATBiddingRequest biddingRequestWithParameter:param completion:^(MATBiddingResponse * _Nullable bidResponse) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!bidResponse.success) {
+                NSError *error = bidResponse.error ?: [NSError errorWithDomain:@"MATDemoErrorDomain" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"unknown bid error"}];
+                MATDemoAdLog(@"Bidding", @"bidFailed", @"placement=%@ code=%ld error=%@", placementID, (long)error.code, MATDemoDescribeError(error));
+                if (failure) {
+                    failure(error);
+                }
+                return;
+            }
+            MATDemoAdLog(@"Bidding", @"bidSuccess", @"placement=%@ price=%.4f requestId=%@", placementID, bidResponse.price, bidResponse.biddingRequestId);
+            // reportTrack：真实接入应在 AdX 竞价胜出（win）后调用；demo 无 mediation，此处模拟胜出上报
+            [MATBiddingRequest reportTrack:bidResponse];
+            if (completion) {
+                completion(bidResponse.biddingRequestId);
+            }
+        });
+    }];
+}
+
+- (void)hbBidAndLoadInterstitialTapped {
+    if (![[MaticooAds shareSDK] isInitSuccess]) {
+        self.hbInterstitialStatusLabel.text = @"Please Init SDK first";
+        return;
+    }
+    if (!self.hbInterstitialAd) {
+        self.hbInterstitialAd = [[MATInterstitialAd alloc] initWithPlacementID:MAT_DEMO_HB_INTERSTITIAL_PLACEMENT_ID];
+        self.hbInterstitialAd.delegate = self;
+    }
+    self.hbInterstitialShowButton.enabled = NO;
+    self.hbInterstitialStatusLabel.text = @"bidding...";
+    [self hbBidWithPlacementID:MAT_DEMO_HB_INTERSTITIAL_PLACEMENT_ID completion:^(NSString *biddingRequestId) {
+        // Bidding 加载：回传询价得到的 requestId
+        [self.hbInterstitialAd loadAd:biddingRequestId];
+    } failure:^(NSError *error) {
+        self.hbInterstitialStatusLabel.text = [NSString stringWithFormat:@"bid failed %@", error.localizedDescription ?: @""];
+    }];
+}
+
+- (void)hbShowInterstitialTapped {
+    // isReadyWithMaticooIds: 与 showAdFromViewController:maticooIds: 同口径：Bidding 按 requestId 精确匹配
+    if ([self.hbInterstitialAd isReadyWithMaticooIds:self.hbInterstitialIds]) {
+        self.hbInterstitialStatusLabel.text = @"";
+        [self.hbInterstitialAd showAdFromViewController:self maticooIds:self.hbInterstitialIds];
+    } else {
+        self.hbInterstitialStatusLabel.text = @"not ready";
+    }
+}
+
+- (void)hbBidAndLoadRewardTapped {
+    if (![[MaticooAds shareSDK] isInitSuccess]) {
+        self.hbRewardStatusLabel.text = @"Please Init SDK first";
+        return;
+    }
+    if (!self.hbRewardedVideoAd) {
+        self.hbRewardedVideoAd = [[MATRewardedVideoAd alloc] initWithPlacementID:MAT_DEMO_HB_REWARD_PLACEMENT_ID];
+        self.hbRewardedVideoAd.delegate = self;
+    }
+    self.hbRewardShowButton.enabled = NO;
+    self.hbRewardStatusLabel.text = @"bidding...";
+    [self hbBidWithPlacementID:MAT_DEMO_HB_REWARD_PLACEMENT_ID completion:^(NSString *biddingRequestId) {
+        // Bidding 加载：回传询价得到的 requestId
+        [self.hbRewardedVideoAd loadAd:biddingRequestId];
+    } failure:^(NSError *error) {
+        self.hbRewardStatusLabel.text = [NSString stringWithFormat:@"bid failed %@", error.localizedDescription ?: @""];
+    }];
+}
+
+- (void)hbShowRewardTapped {
+    // isReadyWithMaticooIds: 与 showAdFromViewController:maticooIds: 同口径：Bidding 按 requestId 精确匹配
+    if ([self.hbRewardedVideoAd isReadyWithMaticooIds:self.hbRewardIds]) {
+        self.hbRewardStatusLabel.text = @"";
+        [self.hbRewardedVideoAd showAdFromViewController:self maticooIds:self.hbRewardIds];
+    } else {
+        self.hbRewardStatusLabel.text = @"not ready";
+    }
+}
+
+- (void)hbBidAndLoadBannerTapped {
+    if (![[MaticooAds shareSDK] isInitSuccess]) {
+        self.hbBannerStatusLabel.text = @"Please Init SDK first";
+        return;
+    }
+    if (!self.hbBannerAd) {
+        self.hbBannerAd = [[MATBannerAd alloc] initWithPlacementID:MAT_DEMO_HB_BANNER_PLACEMENT_ID];
+        self.hbBannerAd.canCloseAd = YES;
+        self.hbBannerAd.delegate = self;
+    }
+    for (UIView *sub in self.hbBannerContainer.subviews) {
+        [sub removeFromSuperview];
+    }
+    [self.hbBannerContainer addSubview:self.hbBannerAd];
+    self.hbBannerAd.translatesAutoresizingMaskIntoConstraints = NO;
+    [NSLayoutConstraint activateConstraints:@[
+        [self.hbBannerAd.leadingAnchor constraintEqualToAnchor:self.hbBannerContainer.leadingAnchor],
+        [self.hbBannerAd.trailingAnchor constraintEqualToAnchor:self.hbBannerContainer.trailingAnchor],
+        [self.hbBannerAd.topAnchor constraintEqualToAnchor:self.hbBannerContainer.topAnchor],
+        [self.hbBannerAd.bottomAnchor constraintEqualToAnchor:self.hbBannerContainer.bottomAnchor],
+    ]];
+
+    self.hbBannerStatusLabel.text = @"bidding...";
+    self.hbBannerContainer.hidden = YES;
+    [self hbBidWithPlacementID:MAT_DEMO_HB_BANNER_PLACEMENT_ID completion:^(NSString *biddingRequestId) {
+        // Bidding 加载：回传询价得到的 requestId
+        [self.hbBannerAd loadAd:biddingRequestId];
+    } failure:^(NSError *error) {
+        self.hbBannerStatusLabel.text = [NSString stringWithFormat:@"bid failed %@", error.localizedDescription ?: @""];
+    }];
+}
+
+- (void)hbBidAndLoadNativeTapped {
+    if (![[MaticooAds shareSDK] isInitSuccess]) {
+        self.hbNativeStatusLabel.text = @"Please Init SDK first";
+        return;
+    }
+    if (!self.hbNativeAd) {
+        self.hbNativeAd = [[MATNativeAd alloc] initWithPlacementID:MAT_DEMO_HB_NATIVE_PLACEMENT_ID];
+        self.hbNativeAd.delegate = self;
+        [MATNativeAdRenderer configureNativeAd:self.hbNativeAd];
+    }
+    self.hbNativeStatusLabel.text = @"bidding...";
+    [self hbBidWithPlacementID:MAT_DEMO_HB_NATIVE_PLACEMENT_ID completion:^(NSString *biddingRequestId) {
+        // Bidding 加载：回传询价得到的 requestId
+        [self.hbNativeAd loadAd:biddingRequestId];
+    } failure:^(NSError *error) {
+        self.hbNativeStatusLabel.text = [NSString stringWithFormat:@"bid failed %@", error.localizedDescription ?: @""];
+    }];
 }
 
 - (void)destroyNativeAd {
@@ -434,12 +655,21 @@
 
 - (void)bannerAdDidLoad:(MATBannerAd *)bannerAd {
     MATDemoAdLog(@"Banner", @"didLoad", @"placement=%@", bannerAd.placementID ?: @"?");
+    if (bannerAd == self.hbBannerAd) {
+        self.hbBannerStatusLabel.text = @"bid load success";
+        self.hbBannerContainer.hidden = NO;
+        return;
+    }
     self.bannerStatusLabel.text = @"load success";
     self.bannerContainer.hidden = NO;
 }
 
 - (void)bannerAd:(MATBannerAd *)bannerAd didFailWithError:(NSError *)error {
     MATDemoAdLog(@"Banner", @"didFailWithError", @"placement=%@ error=%@", bannerAd.placementID ?: @"?", MATDemoDescribeError(error));
+    if (bannerAd == self.hbBannerAd) {
+        self.hbBannerStatusLabel.text = [NSString stringWithFormat:@"bid load failed %@", error.localizedDescription ?: @""];
+        return;
+    }
     self.bannerStatusLabel.text = [NSString stringWithFormat:@"load failed %@", error.localizedDescription ?: @""];
 }
 
@@ -457,114 +687,214 @@
 
 - (void)bannerAdDismissed:(MATBannerAd *)bannerAd {
     MATDemoAdLog(@"Banner", @"dismissed", @"placement=%@", bannerAd.placementID ?: @"?");
+    if (bannerAd == self.hbBannerAd) {
+        self.hbBannerContainer.hidden = YES;
+        self.hbBannerStatusLabel.text = @"";
+    }
 }
 
 #pragma mark - MATInterstitialAdDelegate
 
-- (void)interstitialAdDidLoad:(MATInterstitialAd *)interstitialAd {
+- (BOOL)isHBInterstitialAd:(MATInterstitialAd *)ad {
+    return ad == self.hbInterstitialAd;
+}
+
+- (NSString *)hbInterstitialPidForAd:(MATInterstitialAd *)ad {
+    return [self isHBInterstitialAd:ad] ? MAT_DEMO_HB_INTERSTITIAL_PLACEMENT_ID : MAT_DEMO_INTERSTITIAL_PLACEMENT_ID;
+}
+
+/// 新回调（SDK 新优先：实现本方法后旧 didLoad 不再回调）。
+/// HB：持有 maticooIds 供精确 show；Waterfall：biddingRequestId 为空，show 时回传 SDK 忽略匹配。
+- (void)interstitialAdDidLoad:(MATInterstitialAd *)interstitialAd maticooIds:(MATMaticooIds *)maticooIds {
+    if ([self isHBInterstitialAd:interstitialAd]) {
+        self.hbInterstitialIds = maticooIds;
+        self.hbInterstitialShowButton.enabled = YES;
+        self.hbInterstitialStatusLabel.text = @"bid load success";
+        MATDemoAdLog(@"Bidding", @"didLoad", @"placement=%@ requestId=%@", MAT_DEMO_HB_INTERSTITIAL_PLACEMENT_ID, maticooIds.biddingRequestId ?: @"(waterfall)");
+        return;
+    }
+    self.interstitialIds = maticooIds;
     MATDemoAdLog(@"Interstitial", @"didLoad", @"placement=%@", MAT_DEMO_INTERSTITIAL_PLACEMENT_ID);
     [self setLoading:NO];
     self.interstitialShowButton.enabled = YES;
     self.interstitialStatusLabel.text = @"load success";
 }
 
+/// 旧回调保留仅为满足协议必选；SDK 已实现新回调时不会走到这里
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
+- (void)interstitialAdDidLoad:(MATInterstitialAd *)interstitialAd {
+    MATDemoAdLog(@"Interstitial", @"didLoad(legacy)", @"unreachable: new callback takes priority");
+}
+#pragma clang diagnostic pop
+
 - (void)interstitialAd:(MATInterstitialAd *)interstitialAd didFailWithError:(NSError *)error {
+    if ([self isHBInterstitialAd:interstitialAd]) {
+        MATDemoAdLog(@"Bidding", @"didFailWithError", @"placement=%@ error=%@", MAT_DEMO_HB_INTERSTITIAL_PLACEMENT_ID, MATDemoDescribeError(error));
+        self.hbInterstitialStatusLabel.text = [NSString stringWithFormat:@"bid load failed %@", error.localizedDescription ?: @""];
+        return;
+    }
     MATDemoAdLog(@"Interstitial", @"didFailWithError", @"placement=%@ error=%@", MAT_DEMO_INTERSTITIAL_PLACEMENT_ID, MATDemoDescribeError(error));
     [self setLoading:NO];
     self.interstitialStatusLabel.text = [NSString stringWithFormat:@"load failed %@", error.localizedDescription ?: @""];
 }
 
 - (void)interstitialAd:(MATInterstitialAd *)interstitialAd displayFailWithError:(NSError *)error {
+    if ([self isHBInterstitialAd:interstitialAd]) {
+        MATDemoAdLog(@"Bidding", @"displayFailWithError", @"placement=%@ error=%@", MAT_DEMO_HB_INTERSTITIAL_PLACEMENT_ID, MATDemoDescribeError(error));
+        self.hbInterstitialStatusLabel.text = [NSString stringWithFormat:@"show failed %@", error.localizedDescription ?: @""];
+        return;
+    }
     MATDemoAdLog(@"Interstitial", @"displayFailWithError", @"placement=%@ error=%@", MAT_DEMO_INTERSTITIAL_PLACEMENT_ID, MATDemoDescribeError(error));
     self.interstitialStatusLabel.text = [NSString stringWithFormat:@"show failed %@", error.localizedDescription ?: @""];
 }
 
 - (void)interstitialAdWillLogImpression:(MATInterstitialAd *)interstitialAd {
-    MATDemoAdLog(@"Interstitial", @"willLogImpression", @"placement=%@", MAT_DEMO_INTERSTITIAL_PLACEMENT_ID);
+    MATDemoAdLog([self isHBInterstitialAd:interstitialAd] ? @"Bidding" : @"Interstitial", @"willLogImpression", @"placement=%@", [self hbInterstitialPidForAd:interstitialAd]);
 }
 
 - (void)interstitialAdDidClick:(MATInterstitialAd *)interstitialAd {
-    MATDemoAdLog(@"Interstitial", @"didClick", @"placement=%@", MAT_DEMO_INTERSTITIAL_PLACEMENT_ID);
+    MATDemoAdLog([self isHBInterstitialAd:interstitialAd] ? @"Bidding" : @"Interstitial", @"didClick", @"placement=%@", [self hbInterstitialPidForAd:interstitialAd]);
 }
 
 - (void)interstitialAdWillClose:(MATInterstitialAd *)interstitialAd {
-    MATDemoAdLog(@"Interstitial", @"willClose", @"placement=%@", MAT_DEMO_INTERSTITIAL_PLACEMENT_ID);
+    MATDemoAdLog([self isHBInterstitialAd:interstitialAd] ? @"Bidding" : @"Interstitial", @"willClose", @"placement=%@", [self hbInterstitialPidForAd:interstitialAd]);
 }
 
 - (void)interstitialAdDidClose:(MATInterstitialAd *)interstitialAd {
-    MATDemoAdLog(@"Interstitial", @"didClose", @"placement=%@", MAT_DEMO_INTERSTITIAL_PLACEMENT_ID);
-    self.interstitialStatusLabel.text = @"";
+    MATDemoAdLog([self isHBInterstitialAd:interstitialAd] ? @"Bidding" : @"Interstitial", @"didClose", @"placement=%@", [self hbInterstitialPidForAd:interstitialAd]);
+    if ([self isHBInterstitialAd:interstitialAd]) {
+        self.hbInterstitialStatusLabel.text = @"";
+        self.hbInterstitialShowButton.enabled = NO;
+        self.hbInterstitialIds = nil;
+    } else {
+        self.interstitialStatusLabel.text = @"";
+    }
 }
 
 - (void)interstitialAdEndCardShow:(MATInterstitialAd *)interstitialAd {
-    MATDemoAdLog(@"Interstitial", @"endCardShow", @"placement=%@", MAT_DEMO_INTERSTITIAL_PLACEMENT_ID);
+    MATDemoAdLog([self isHBInterstitialAd:interstitialAd] ? @"Bidding" : @"Interstitial", @"endCardShow", @"placement=%@", [self hbInterstitialPidForAd:interstitialAd]);
 }
 
 #pragma mark - MATRewardedVideoAdDelegate
 
-- (void)rewardedVideoAdDidLoad:(MATRewardedVideoAd *)rewardedVideoAd {
+- (BOOL)isHBRewardAd:(MATRewardedVideoAd *)ad {
+    return ad == self.hbRewardedVideoAd;
+}
+
+- (NSString *)hbRewardPidForAd:(MATRewardedVideoAd *)ad {
+    return [self isHBRewardAd:ad] ? MAT_DEMO_HB_REWARD_PLACEMENT_ID : MAT_DEMO_REWARD_PLACEMENT_ID;
+}
+
+/// 新回调（SDK 新优先：实现本方法后旧 didLoad 不再回调）。
+/// HB：持有 maticooIds 供精确 show；Waterfall：biddingRequestId 为空，show 时回传 SDK 忽略匹配。
+- (void)rewardedVideoAdDidLoad:(MATRewardedVideoAd *)rewardedVideoAd maticooIds:(MATMaticooIds *)maticooIds {
+    if ([self isHBRewardAd:rewardedVideoAd]) {
+        self.hbRewardIds = maticooIds;
+        self.hbRewardShowButton.enabled = YES;
+        self.hbRewardStatusLabel.text = @"bid load success";
+        MATDemoAdLog(@"Bidding", @"didLoad", @"placement=%@ requestId=%@", MAT_DEMO_HB_REWARD_PLACEMENT_ID, maticooIds.biddingRequestId ?: @"(waterfall)");
+        return;
+    }
+    self.rewardIds = maticooIds;
     MATDemoAdLog(@"Rewarded", @"didLoad", @"placement=%@", MAT_DEMO_REWARD_PLACEMENT_ID);
     [self setLoading:NO];
     self.rewardShowButton.enabled = YES;
     self.rewardStatusLabel.text = @"load success";
 }
 
+/// 旧回调保留仅为满足协议必选；SDK 已实现新回调时不会走到这里
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
+- (void)rewardedVideoAdDidLoad:(MATRewardedVideoAd *)rewardedVideoAd {
+    MATDemoAdLog(@"Rewarded", @"didLoad(legacy)", @"unreachable: new callback takes priority");
+}
+#pragma clang diagnostic pop
+
 - (void)rewardedVideoAd:(MATRewardedVideoAd *)rewardedVideoAd didFailWithError:(NSError *)error {
+    if ([self isHBRewardAd:rewardedVideoAd]) {
+        MATDemoAdLog(@"Bidding", @"didFailWithError", @"placement=%@ error=%@", MAT_DEMO_HB_REWARD_PLACEMENT_ID, MATDemoDescribeError(error));
+        self.hbRewardStatusLabel.text = [NSString stringWithFormat:@"bid load failed %@", error.localizedDescription ?: @""];
+        return;
+    }
     MATDemoAdLog(@"Rewarded", @"didFailWithError", @"placement=%@ error=%@", MAT_DEMO_REWARD_PLACEMENT_ID, MATDemoDescribeError(error));
     [self setLoading:NO];
     self.rewardStatusLabel.text = [NSString stringWithFormat:@"load failed %@", error.localizedDescription ?: @""];
 }
 
 - (void)rewardedVideoAd:(MATRewardedVideoAd *)rewardedVideoAd displayFailWithError:(NSError *)error {
+    if ([self isHBRewardAd:rewardedVideoAd]) {
+        MATDemoAdLog(@"Bidding", @"displayFailWithError", @"placement=%@ error=%@", MAT_DEMO_HB_REWARD_PLACEMENT_ID, MATDemoDescribeError(error));
+        self.hbRewardStatusLabel.text = [NSString stringWithFormat:@"show failed %@", error.localizedDescription ?: @""];
+        return;
+    }
     MATDemoAdLog(@"Rewarded", @"displayFailWithError", @"placement=%@ error=%@", MAT_DEMO_REWARD_PLACEMENT_ID, MATDemoDescribeError(error));
     self.rewardStatusLabel.text = [NSString stringWithFormat:@"show failed %@", error.localizedDescription ?: @""];
 }
 
 - (void)rewardedVideoAdStarted:(MATRewardedVideoAd *)rewardedVideoAd {
-    MATDemoAdLog(@"Rewarded", @"started", @"placement=%@", MAT_DEMO_REWARD_PLACEMENT_ID);
+    MATDemoAdLog([self isHBRewardAd:rewardedVideoAd] ? @"Bidding" : @"Rewarded", @"started", @"placement=%@", [self hbRewardPidForAd:rewardedVideoAd]);
 }
 
 - (void)rewardedVideoAdCompleted:(MATRewardedVideoAd *)rewardedVideoAd {
-    MATDemoAdLog(@"Rewarded", @"completed", @"placement=%@", MAT_DEMO_REWARD_PLACEMENT_ID);
+    MATDemoAdLog([self isHBRewardAd:rewardedVideoAd] ? @"Bidding" : @"Rewarded", @"completed", @"placement=%@", [self hbRewardPidForAd:rewardedVideoAd]);
 }
 
 - (void)rewardedVideoAdWillLogImpression:(MATRewardedVideoAd *)rewardedVideoAd {
-    MATDemoAdLog(@"Rewarded", @"willLogImpression", @"placement=%@", MAT_DEMO_REWARD_PLACEMENT_ID);
+    MATDemoAdLog([self isHBRewardAd:rewardedVideoAd] ? @"Bidding" : @"Rewarded", @"willLogImpression", @"placement=%@", [self hbRewardPidForAd:rewardedVideoAd]);
 }
 
 - (void)rewardedVideoAdDidClick:(MATRewardedVideoAd *)rewardedVideoAd {
-    MATDemoAdLog(@"Rewarded", @"didClick", @"placement=%@", MAT_DEMO_REWARD_PLACEMENT_ID);
+    MATDemoAdLog([self isHBRewardAd:rewardedVideoAd] ? @"Bidding" : @"Rewarded", @"didClick", @"placement=%@", [self hbRewardPidForAd:rewardedVideoAd]);
 }
 
 - (void)rewardedVideoAdWillClose:(MATRewardedVideoAd *)rewardedVideoAd {
-    MATDemoAdLog(@"Rewarded", @"willClose", @"placement=%@", MAT_DEMO_REWARD_PLACEMENT_ID);
+    MATDemoAdLog([self isHBRewardAd:rewardedVideoAd] ? @"Bidding" : @"Rewarded", @"willClose", @"placement=%@", [self hbRewardPidForAd:rewardedVideoAd]);
 }
 
 - (void)rewardedVideoAdDidClose:(MATRewardedVideoAd *)rewardedVideoAd {
-    MATDemoAdLog(@"Rewarded", @"didClose", @"placement=%@", MAT_DEMO_REWARD_PLACEMENT_ID);
-    self.rewardStatusLabel.text = @"";
+    MATDemoAdLog([self isHBRewardAd:rewardedVideoAd] ? @"Bidding" : @"Rewarded", @"didClose", @"placement=%@", [self hbRewardPidForAd:rewardedVideoAd]);
+    if ([self isHBRewardAd:rewardedVideoAd]) {
+        self.hbRewardStatusLabel.text = @"";
+        self.hbRewardShowButton.enabled = NO;
+        self.hbRewardIds = nil;
+    } else {
+        self.rewardStatusLabel.text = @"";
+    }
 }
 
 - (void)rewardedVideoAdReward:(MATRewardedVideoAd *)rewardedVideoAd rewardInfo:(MATRewardInfo *)rewardInfo {
-    MATDemoAdLog(@"Rewarded", @"didReward", @"placement=%@ rewardId=%@ name=%@ amount=%ld",
-                 MAT_DEMO_REWARD_PLACEMENT_ID,
+    MATDemoAdLog([self isHBRewardAd:rewardedVideoAd] ? @"Bidding" : @"Rewarded", @"didReward", @"placement=%@ rewardId=%@ name=%@ amount=%ld",
+                 [self hbRewardPidForAd:rewardedVideoAd],
                  rewardInfo.rewardId ?: @"—",
                  rewardInfo.rewardName ?: @"—",
                  (long)rewardInfo.rewardAmount);
 }
 
 - (void)rewardedVideoAdDidSkip:(MATRewardedVideoAd *)rewardedVideoAd {
-    MATDemoAdLog(@"Rewarded", @"didSkip", @"placement=%@", MAT_DEMO_REWARD_PLACEMENT_ID);
+    MATDemoAdLog([self isHBRewardAd:rewardedVideoAd] ? @"Bidding" : @"Rewarded", @"didSkip", @"placement=%@", [self hbRewardPidForAd:rewardedVideoAd]);
 }
 
 - (void)rewardedVideoAdEndCardShow:(MATRewardedVideoAd *)rewardedVideoAd {
-    MATDemoAdLog(@"Rewarded", @"endCardShow", @"placement=%@", MAT_DEMO_REWARD_PLACEMENT_ID);
+    MATDemoAdLog([self isHBRewardAd:rewardedVideoAd] ? @"Bidding" : @"Rewarded", @"endCardShow", @"placement=%@", [self hbRewardPidForAd:rewardedVideoAd]);
 }
 
 #pragma mark - MATNativeAdDelegate
 
 - (void)nativeAdLoadSuccess:(MATNativeAd *)nativeAd {
     MATDemoAdLog(@"Native", @"didLoad", @"placement=%@", nativeAd.placementID ?: @"?");
+    if (nativeAd == self.hbNativeAd) {
+        self.hbNativeStatusLabel.text = @"bid load success";
+        __weak typeof(self) weakSelf = self;
+        [MATNativeAdPresenter presentNativeAd:nativeAd fromViewController:self onDismiss:^{
+            weakSelf.hbNativeStatusLabel.text = @"";
+            if (weakSelf.hbNativeAd) {
+                [weakSelf.hbNativeAd destroy];
+                weakSelf.hbNativeAd = nil;
+            }
+        }];
+        return;
+    }
     self.nativeStatusLabel.text = @"load success";
     [self flashMessage:@"Native load success"];
 
@@ -580,6 +910,10 @@
 
 - (void)nativeAdFailed:(MATNativeAd *)nativeAd withError:(NSError *)error {
     MATDemoAdLog(@"Native", @"didFailWithError", @"placement=%@ error=%@", nativeAd.placementID ?: @"?", MATDemoDescribeError(error));
+    if (nativeAd == self.hbNativeAd) {
+        self.hbNativeStatusLabel.text = [NSString stringWithFormat:@"bid load failed %@", error.localizedDescription ?: @""];
+        return;
+    }
     self.nativeStatusLabel.text = [NSString stringWithFormat:@"load failed %@", error.localizedDescription ?: @""];
     [self flashMessage:@"Native load failed"];
 }
