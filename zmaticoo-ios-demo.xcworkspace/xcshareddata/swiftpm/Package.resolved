@@ -1,0 +1,15 @@
+{
+  "originHash" : "e7327624847d90143aab5a434591b078372b405d7e00ae94de1fb6ff2643e445",
+  "pins" : [
+    {
+      "identity" : "zmaticoopodspec",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cloudadrd/zMaticooPodSpec",
+      "state" : {
+        "revision" : "4ab002757d41df1beb802947e8d03c67f7b90447",
+        "version" : "2.3.2"
+      }
+    }
+  ],
+  "version" : 3
+}

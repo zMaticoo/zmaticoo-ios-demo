@@ -4,12 +4,14 @@
 //
 
 #import "SettingViewController.h"
+#import "MATDemoConfig.h"
 #import <MaticooSDK/MaticooSDK.h>
 
 @interface SettingViewController ()
 @property (nonatomic, strong) UISwitch *switchGdpr;
 @property (nonatomic, strong) UISwitch *switchDoNotStatus;
 @property (nonatomic, strong) UISwitch *switchCoppa;
+@property (nonatomic, strong) UISwitch *switchVideoMute;
 @end
 
 @implementation SettingViewController
@@ -48,19 +50,26 @@
     self.switchGdpr = [[UISwitch alloc] init];
     self.switchDoNotStatus = [[UISwitch alloc] init];
     self.switchCoppa = [[UISwitch alloc] init];
+    self.switchVideoMute = [[UISwitch alloc] init];
 
     MaticooAds *sdk = [MaticooAds shareSDK];
     self.switchGdpr.on = [sdk getConsentStatus];
     self.switchDoNotStatus.on = [sdk getDoNotSell];
     self.switchCoppa.on = [sdk getIsAgeRestrictedUser];
+    // 全局静音：SDK 侧赋值前读取无意义（未配置返回 NO），开关状态由 demo 自己持久化，默认静音（与 SDK 默认一致）
+    id videoMuteStored = [[NSUserDefaults standardUserDefaults] objectForKey:MAT_DEMO_VIDEO_MUTE_KEY];
+    self.switchVideoMute.on = videoMuteStored ? [videoMuteStored boolValue] : YES;
+    sdk.videoMute = self.switchVideoMute.on;
 
     [self.switchGdpr addTarget:self action:@selector(gdprChanged:) forControlEvents:UIControlEventValueChanged];
     [self.switchDoNotStatus addTarget:self action:@selector(doNotStatusChanged:) forControlEvents:UIControlEventValueChanged];
     [self.switchCoppa addTarget:self action:@selector(coppaChanged:) forControlEvents:UIControlEventValueChanged];
+    [self.switchVideoMute addTarget:self action:@selector(videoMuteChanged:) forControlEvents:UIControlEventValueChanged];
 
     [stack addArrangedSubview:[self rowWithTitle:@"GDPR" switchView:self.switchGdpr]];
     [stack addArrangedSubview:[self rowWithTitle:@"DoNotStatus" switchView:self.switchDoNotStatus]];
     [stack addArrangedSubview:[self rowWithTitle:@"CoppaStatus" switchView:self.switchCoppa]];
+    [stack addArrangedSubview:[self rowWithTitle:@"VideoMute" switchView:self.switchVideoMute]];
 }
 
 - (UIColor *)groupedBackgroundColor {
@@ -119,6 +128,11 @@
 
 - (void)coppaChanged:(UISwitch *)sender {
     [[MaticooAds shareSDK] setIsAgeRestrictedUser:sender.isOn];
+}
+
+- (void)videoMuteChanged:(UISwitch *)sender {
+    [MaticooAds shareSDK].videoMute = sender.isOn;
+    [[NSUserDefaults standardUserDefaults] setBool:sender.isOn forKey:MAT_DEMO_VIDEO_MUTE_KEY];
 }
 
 @end

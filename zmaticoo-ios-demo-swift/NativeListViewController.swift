@@ -335,6 +335,8 @@ enum DemoConfig {
     static let hbNativePlacementID = "1004646610"
     // 询价请求中的 AdX ID（由你的 AdX 合作方提供）
     static let adxID = "adx_id"
+    // 全局静音（全屏广告）开关的持久化 key；未存储过视为 true（静音，与 SDK 默认一致）
+    static let videoMuteKey = "MATDemoVideoMuteKey"
 }
 
 // MARK: - NativeListNormalCell

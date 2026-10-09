@@ -24,4 +24,7 @@
 // 询价请求中的 AdX ID（由你的 AdX 合作方提供）
 #define MAT_DEMO_ADX_ID @"adx_id"
 
+// 全局静音（全屏广告）开关的持久化 key；未存储过视为 YES（静音，与 SDK 默认一致）
+#define MAT_DEMO_VIDEO_MUTE_KEY @"MATDemoVideoMuteKey"
+
 #endif /* MATDemoConfig_h */

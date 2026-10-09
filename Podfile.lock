@@ -1,16 +1,16 @@
 PODS:
-  - zMaticoo (2.3.1)
+  - zMaticoo (2.3.2)
 
 DEPENDENCIES:
-  - zMaticoo (= 2.3.1)
+  - zMaticoo (= 2.3.2)
 
 SPEC REPOS:
   trunk:
     - zMaticoo
 
 SPEC CHECKSUMS:
-  zMaticoo: c9ee22d7905105e4b2f09633f04c3746ccf21f89
+  zMaticoo: 8e640da320a2fe0892c20dcc7d3e5be7725de7a5
 
-PODFILE CHECKSUM: edbf1b975f71ba41b1bd18e724696c5c5e433bc7
+PODFILE CHECKSUM: 374a4e901f255a68f21be51c6f6f7b338588fb67
 
 COCOAPODS: 1.16.2

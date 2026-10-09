@@ -394,6 +394,8 @@ class ViewController: UIViewController,
     @objc private func initSDKTapped() {
         initStatusLabel.text = "initializing..."
         MaticooAds.shareSDK().initSDK(DemoConfig.appKey) { [weak self] in
+            // 重放持久化的全局静音偏好（未存储过视为静音，与 SDK 默认一致）
+            MaticooAds.shareSDK().videoMute = UserDefaults.standard.object(forKey: DemoConfig.videoMuteKey) as? Bool ?? true
             self?.initStatusLabel.text = "init success"
             self?.flashMessage("SDK Init Success")
         } onError: { [weak self] error in

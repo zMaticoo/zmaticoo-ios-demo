@@ -350,6 +350,9 @@
     __weak typeof(self) weakSelf = self;
     [[MaticooAds shareSDK] initSDK:MAT_DEMO_APP_KEY onSuccess:^{
         dispatch_async(dispatch_get_main_queue(), ^{
+            // 重放持久化的全局静音偏好（未存储过视为静音，与 SDK 默认一致）
+            id videoMuteStored = [[NSUserDefaults standardUserDefaults] objectForKey:MAT_DEMO_VIDEO_MUTE_KEY];
+            [MaticooAds shareSDK].videoMute = videoMuteStored ? [videoMuteStored boolValue] : YES;
             [weakSelf flashMessage:@"SDK Init Success"];
         });
     } onError:^(NSError *error) {

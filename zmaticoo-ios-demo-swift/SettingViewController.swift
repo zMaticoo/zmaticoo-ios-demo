@@ -14,6 +14,7 @@ final class SettingViewController: UIViewController {
     private let switchGdpr = UISwitch()
     private let switchDoNotSell = UISwitch()
     private let switchCoppa = UISwitch()
+    private let switchVideoMute = UISwitch()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,14 +50,19 @@ final class SettingViewController: UIViewController {
         switchGdpr.isOn = sdk.getConsentStatus()
         switchDoNotSell.isOn = sdk.getDoNotSell()
         switchCoppa.isOn = sdk.getIsAgeRestrictedUser()
+        // 全局静音：SDK 侧赋值前读取无意义（未配置返回 NO），开关状态由 demo 自己持久化，默认静音（与 SDK 默认一致）
+        switchVideoMute.isOn = UserDefaults.standard.object(forKey: DemoConfig.videoMuteKey) as? Bool ?? true
+        sdk.videoMute = switchVideoMute.isOn
 
         switchGdpr.addTarget(self, action: #selector(gdprChanged(_:)), for: .valueChanged)
         switchDoNotSell.addTarget(self, action: #selector(doNotSellChanged(_:)), for: .valueChanged)
         switchCoppa.addTarget(self, action: #selector(coppaChanged(_:)), for: .valueChanged)
+        switchVideoMute.addTarget(self, action: #selector(videoMuteChanged(_:)), for: .valueChanged)
 
         stack.addArrangedSubview(row(title: "GDPR", switchView: switchGdpr))
         stack.addArrangedSubview(row(title: "DoNotSell", switchView: switchDoNotSell))
         stack.addArrangedSubview(row(title: "CoppaStatus", switchView: switchCoppa))
+        stack.addArrangedSubview(row(title: "VideoMute", switchView: switchVideoMute))
     }
 
     @objc private func doneTapped() {
@@ -73,6 +79,11 @@ final class SettingViewController: UIViewController {
 
     @objc private func coppaChanged(_ sender: UISwitch) {
         MaticooAds.shareSDK().setIsAgeRestrictedUser(sender.isOn)
+    }
+
+    @objc private func videoMuteChanged(_ sender: UISwitch) {
+        MaticooAds.shareSDK().videoMute = sender.isOn
+        UserDefaults.standard.set(sender.isOn, forKey: DemoConfig.videoMuteKey)
     }
 
     // MARK: - UI Helpers
